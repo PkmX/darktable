@@ -332,9 +332,6 @@ def add_edges(gr):
   # want dithering very late
   gr.add_edge(('dither', 'watermark'))
 
-  # ensure that inputs are clamped during lut lookup
-  gr.add_edge(('haldclut', 'overexposed'))
-
   # want to sharpen after geometric transformations:
   gr.add_edge(('sharpen', 'clipping'))
   gr.add_edge(('sharpen', 'lens'))
