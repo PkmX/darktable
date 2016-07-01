@@ -157,6 +157,7 @@ def add_edges(gr):
   gr.add_edge(('colorout', 'colorzones'))
   gr.add_edge(('colorout', 'lowlight'))
   gr.add_edge(('colorout', 'monochrome'))
+  gr.add_edge(('colorout', 'vibrance'))
   gr.add_edge(('colorout', 'zonesystem'))
   gr.add_edge(('colorout', 'tonecurve'))
   gr.add_edge(('colorout', 'levels'))
@@ -181,6 +182,7 @@ def add_edges(gr):
   gr.add_edge(('colorzones', 'colorin'))
   gr.add_edge(('lowlight', 'colorin'))
   gr.add_edge(('monochrome', 'colorin'))
+  gr.add_edge(('vibrance', 'colorin'))
   gr.add_edge(('zonesystem', 'colorin'))
   gr.add_edge(('tonecurve', 'colorin'))
   gr.add_edge(('levels', 'colorin'))
@@ -207,6 +209,7 @@ def add_edges(gr):
   gr.add_edge(('colorzones', 'colorreconstruction'))
   gr.add_edge(('lowlight', 'colorreconstruction'))
   gr.add_edge(('monochrome', 'colorreconstruction'))
+  gr.add_edge(('vibrance', 'colorreconstruction'))
   gr.add_edge(('zonesystem', 'colorreconstruction'))
   gr.add_edge(('tonecurve', 'colorreconstruction'))
   gr.add_edge(('levels', 'colorreconstruction'))
@@ -284,6 +287,7 @@ def add_edges(gr):
   gr.add_edge(('gamma', 'overexposed'))
   gr.add_edge(('gamma', 'borders'))
   gr.add_edge(('gamma', 'dither'))
+  gr.add_edge(('gamma', 'haldclut'))
   gr.add_edge(('channelmixer', 'colorout'))
   gr.add_edge(('clahe', 'colorout'))
   gr.add_edge(('velvia', 'colorout'))
@@ -293,6 +297,7 @@ def add_edges(gr):
   gr.add_edge(('watermark', 'colorout'))
   gr.add_edge(('overexposed', 'colorout'))
   gr.add_edge(('dither', 'colorout'))
+  gr.add_edge(('haldclut', 'colorout'))
 
   # borders should not change shape/color:
   gr.add_edge(('borders', 'colorout'))
@@ -302,6 +307,7 @@ def add_edges(gr):
   gr.add_edge(('borders', 'soften'))
   gr.add_edge(('borders', 'clahe'))
   gr.add_edge(('borders', 'channelmixer'))
+  gr.add_edge(('borders', 'haldclut'))
   # don't indicate borders as over/under exposed
   gr.add_edge(('borders', 'overexposed'))
   # don't resample borders when scaling to the output dimensions
@@ -315,6 +321,7 @@ def add_edges(gr):
   gr.add_edge(('finalscale', 'soften'))
   gr.add_edge(('finalscale', 'clahe'))
   gr.add_edge(('finalscale', 'channelmixer'))
+  gr.add_edge(('finalscale', 'haldclut'))
   gr.add_edge(('finalscale', 'overexposed'))
 
   # but watermark can be drawn on top of borders
@@ -324,6 +331,9 @@ def add_edges(gr):
 
   # want dithering very late
   gr.add_edge(('dither', 'watermark'))
+
+  # ensure that inputs are clamped during lut lookup
+  gr.add_edge(('haldclut', 'overexposed'))
 
   # want to sharpen after geometric transformations:
   gr.add_edge(('sharpen', 'clipping'))
@@ -363,6 +373,7 @@ def add_edges(gr):
   gr.add_edge(('tonecurve', 'colormapping'))
   gr.add_edge(('levels', 'colormapping'))
   gr.add_edge(('monochrome', 'colormapping'))
+  gr.add_edge(('vibrance', 'colormapping'))
   gr.add_edge(('zonesystem', 'colormapping'))
   gr.add_edge(('colisa', 'colormapping'))
   gr.add_edge(('colorcorrection', 'colormapping'))
@@ -439,6 +450,7 @@ def add_edges(gr):
   gr.add_edge(('colorzones', 'colorchecker'))
   gr.add_edge(('lowlight', 'colorchecker'))
   gr.add_edge(('monochrome', 'colorchecker'))
+  gr.add_edge(('vibrance', 'colorchecker'))
   gr.add_edge(('zonesystem', 'colorchecker'))
   gr.add_edge(('tonecurve', 'colorchecker'))
   gr.add_edge(('levels', 'colorchecker'))
@@ -492,6 +504,7 @@ gr.add_nodes([
 'globaltonemap',
 'graduatednd',
 'grain',
+'haldclut',
 'highlights',
 'highpass',
 'invert',
@@ -518,6 +531,7 @@ gr.add_nodes([
 'tonecurve',
 'tonemap',
 'velvia',
+'vibrance',
 'vignette',
 'watermark',
 'zonesystem',

@@ -545,7 +545,7 @@ void init(dt_iop_module_t *self)
   self->default_params = calloc(1, sizeof(dt_iop_rawprepare_params_t));
   self->hide_enable_button = 1;
   self->default_enabled = dt_image_is_raw(image) && image->bpp != sizeof(float);
-  self->priority = 10; // module order created by iop_dependencies.py, do not edit!
+  self->priority = 14; // module order created by iop_dependencies.py, do not edit!
   self->params_size = sizeof(dt_iop_rawprepare_params_t);
   self->gui_data = NULL;
 }
