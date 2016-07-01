@@ -31,6 +31,7 @@
 #include <png.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 DT_MODULE_INTROSPECTION(1, dt_iop_haldclut_params_t)
 
@@ -278,7 +279,27 @@ static void button_clicked(GtkWidget *widget, dt_iop_module_t *self)
       _("select haldclut file"), GTK_WINDOW(win), GTK_FILE_CHOOSER_ACTION_OPEN, _("_cancel"), GTK_RESPONSE_CANCEL,
       _("_select"), GTK_RESPONSE_ACCEPT, (char *)NULL);
   gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(filechooser), FALSE);
-  gtk_file_chooser_select_filename(GTK_FILE_CHOOSER(filechooser), p->filepath);
+
+  if (strlen(p->filepath) == 0 || access(p->filepath, F_OK) == -1)
+  {
+    gchar* def_path = dt_conf_get_string("plugins/darkroom/haldclut/def_path");
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(filechooser), def_path);
+    g_free(def_path);
+  }
+  else
+  {
+    gtk_file_chooser_select_filename(GTK_FILE_CHOOSER(filechooser), p->filepath);
+  }
+
+  GtkFileFilter* filter = GTK_FILE_FILTER(gtk_file_filter_new());
+  gtk_file_filter_add_mime_type(filter, "image/png");
+  gtk_file_filter_set_name(filter, _("hald cluts (png)"));
+  gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(filechooser), filter);
+
+  filter = GTK_FILE_FILTER(gtk_file_filter_new());
+  gtk_file_filter_add_pattern(filter, "*");
+  gtk_file_filter_set_name(filter, _("all files"));
+  gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(filechooser), filter);
 
   if(gtk_dialog_run(GTK_DIALOG(filechooser)) == GTK_RESPONSE_ACCEPT)
   {
