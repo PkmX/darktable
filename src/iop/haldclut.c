@@ -1,6 +1,6 @@
 /*
     This file is part of darktable,
-    copyright (c) 2009--2012 johannes hanika.
+    copyright (c) 2016 Chih-Mao Chen
 
     darktable is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -210,7 +210,7 @@ void process(struct dt_iop_module_t *self, dt_dev_pixelpipe_iop_t *piece, const 
 
 noop:
 #ifdef _OPENMP
-#pragma omp parallel for default(none) schedule(static) shared(buf, level)
+#pragma omp parallel for default(none) schedule(static)
 #endif
   for(int j = 0; j < roi_out->height; j++)
   {
