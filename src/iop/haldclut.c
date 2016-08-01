@@ -130,7 +130,7 @@ void correct_pixel(float *input, float *output, float *clut, unsigned int level)
   output[2] = output[2] * (1 - b) + tmp[2] * b;
 }
 
-void process(struct dt_iop_module_t *self, dt_dev_pixelpipe_iop_t *piece, const void *const i, void *const o,
+void process(struct dt_iop_module_t *self, dt_dev_pixelpipe_iop_t *piece, const void *const ibuf, void *const obuf,
              const dt_iop_roi_t *const roi_in, const dt_iop_roi_t *const roi_out)
 {
   dt_iop_haldclut_params_t *params = (dt_iop_haldclut_params_t *)piece->data;
@@ -195,8 +195,8 @@ void process(struct dt_iop_module_t *self, dt_dev_pixelpipe_iop_t *piece, const 
 #endif
   for(int j = 0; j < roi_out->height; j++)
   {
-    float *in = ((float *)i) + (size_t)ch * roi_in->width * j;
-    float *out = ((float *)o) + (size_t)ch * roi_out->width * j;
+    float *in = ((float *)ibuf) + (size_t)ch * roi_in->width * j;
+    float *out = ((float *)obuf) + (size_t)ch * roi_out->width * j;
     for(int i = 0; i < roi_out->width; i++)
     {
       for(int c = 0; c < 3; ++c) in[c] = in[c] < 0.0f ? 0.0f : (in[c] > 1.0f ? 1.0f : in[c]);
@@ -215,8 +215,8 @@ noop:
 #endif
   for(int j = 0; j < roi_out->height; j++)
   {
-    float *in = ((float *)i) + (size_t)ch * roi_in->width * j;
-    float *out = ((float *)o) + (size_t)ch * roi_out->width * j;
+    float *in = ((float *)ibuf) + (size_t)ch * roi_in->width * j;
+    float *out = ((float *)obuf) + (size_t)ch * roi_out->width * j;
     for(int i = 0; i < roi_out->width; i++)
     {
       for(int c = 0; c < 3; ++c) out[c] = in[c];
