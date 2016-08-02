@@ -56,7 +56,7 @@ if (( $# >= 1 )); then
     for f in "$@"; do
         convert "${workdir}/identity.png" "${f}" -hald-clut "${workdir}/output.png"
         darktable-cli "${workdir}/output.png" to-lab.xmp "${workdir}/output.pfm"
-        style_name=$(basename "${f}")
+        style_name=$(basename -s .png "${f}")
         darktable-chart "${workdir}/identity.pfm" "haldclut${chartsize}.cht" "${workdir}/output.pfm" 1 "${num_patches}" "${f%.png}.dtstyle" "${style_name}" "${style_name}"
         rm -f "${workdir}/output.pfm"
     done
