@@ -1585,15 +1585,23 @@ static int main_gui(dt_lut_t *self, int argc, char *argv[])
 
       if (success)
       {
-        gtk_combo_box_set_active(GTK_COMBO_BOX(self->gray_ramp), gray_ramp_id);
-        gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->number_patches), npatches);
         self->source.bb[TOP_LEFT] = self->reference.bb[TOP_LEFT] = (point_t) { 0.0f, 0.0f };
         self->source.bb[TOP_RIGHT] = self->reference.bb[TOP_RIGHT] = (point_t) { 1.0f, 0.0f };
         self->source.bb[BOTTOM_RIGHT] = self->reference.bb[BOTTOM_RIGHT] = (point_t) { 1.0f, 1.0f };
         self->source.bb[BOTTOM_LEFT] = self->reference.bb[BOTTOM_LEFT] = (point_t) { 0.0f, 1.0f };
-        process_button_clicked_callback(GTK_BUTTON(self->process_button), self);
+
+        collect_source_patches(self);
+        collect_reference_patches(self);
+        update_table(self);
+
+        if (argc >= 5) gtk_combo_box_set_active(GTK_COMBO_BOX(self->gray_ramp), gray_ramp_id);
+        if (argc >= 6) gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->number_patches), npatches);
+
         if (output_filename && dtstyle_name && dtstyle_description)
+        {
+          process_button_clicked_callback(GTK_BUTTON(self->process_button), self);
           export_style(self, output_filename, dtstyle_name, dtstyle_description);
+        }
       }
     }
   }
@@ -1738,7 +1746,7 @@ static int main_csv(dt_lut_t *self, int argc, char *argv[])
 
 static void show_usage(const char *exe)
 {
-  fprintf(stderr, "Usage: %1$s [<input Lab pfm file>] [<cht file>] [<reference cgats/it8 or Lab pfm file>]\n"
+  fprintf(stderr, "Usage: %1$s [<input Lab pfm file>] [<cht file>] [<reference cgats/it8 or Lab pfm file>] [gray ramp id] [number of final patches] [output filename] [style name] [style description]\n"
                   "       %1$s --csv <csv file> <number patches> <output dtstyle file>\n",
           exe);
 }
