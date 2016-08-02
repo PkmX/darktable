@@ -1519,6 +1519,12 @@ static int main_gui(dt_lut_t *self, int argc, char *argv[])
   char *cht_filename = argc >= 3 ? argv[2] : NULL;
   char *it8_filename = NULL;
   char *reference_filename = NULL;
+  int gray_ramp_id = argc >= 5 ? atoi(argv[4]) : 0;
+  int npatches = argc >= 6 ? atoi(argv[5]) : 24;
+  char *output_filename = argc >= 7 ? argv[6] : NULL;
+  char *dtstyle_name = argc >= 8 ? argv[7] : NULL;
+  char *dtstyle_description = argc >= 9 ? argv[8] : NULL;
+
   if(argc >= 4)
   {
     char *upper_string = g_ascii_strup(argv[3], -1);
@@ -1554,7 +1560,8 @@ static int main_gui(dt_lut_t *self, int argc, char *argv[])
   gtk_widget_set_sensitive(self->export_button, FALSE);
   gtk_widget_set_sensitive(self->export_raw_button, FALSE);
 
-  gtk_widget_show_all(window);
+  if (argc < 9)
+    gtk_widget_show_all(window);
 
   // only load data now so it can fill widgets
   if(source_filename && open_source_image(self, source_filename))
@@ -1562,18 +1569,37 @@ static int main_gui(dt_lut_t *self, int argc, char *argv[])
     gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->image_button), source_filename);
     if(cht_filename && open_cht(self, cht_filename))
     {
+      bool success = false;
       gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->cht_button), cht_filename);
       if(it8_filename && open_it8(self, it8_filename))
+      {
+        success = true;
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->it8_button), it8_filename);
+      }
       if(reference_filename && open_reference_image(self, reference_filename))
       {
+        success = true;
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->reference_image_button), reference_filename);
         gtk_combo_box_set_active(GTK_COMBO_BOX(self->reference_mode), 1);
+      }
+
+      if (success)
+      {
+        gtk_combo_box_set_active(GTK_COMBO_BOX(self->gray_ramp), gray_ramp_id);
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->number_patches), npatches);
+        self->source.bb[TOP_LEFT] = self->reference.bb[TOP_LEFT] = (point_t) { 0.0f, 0.0f };
+        self->source.bb[TOP_RIGHT] = self->reference.bb[TOP_RIGHT] = (point_t) { 1.0f, 0.0f };
+        self->source.bb[BOTTOM_RIGHT] = self->reference.bb[BOTTOM_RIGHT] = (point_t) { 1.0f, 1.0f };
+        self->source.bb[BOTTOM_LEFT] = self->reference.bb[BOTTOM_LEFT] = (point_t) { 0.0f, 1.0f };
+        process_button_clicked_callback(GTK_BUTTON(self->process_button), self);
+        if (output_filename && dtstyle_name && dtstyle_description)
+          export_style(self, output_filename, dtstyle_name, dtstyle_description);
       }
     }
   }
 
-  gtk_main();
+  if (argc < 9)
+    gtk_main();
 
   return 0;
 }
@@ -1736,7 +1762,7 @@ int main(int argc, char *argv[])
     else
       res = main_csv(self, argc, argv);
   }
-  else if(argc <= 4)
+  else if(argc <= 9)
     res = main_gui(self, argc, argv);
   else
     show_usage(argv[0]);
